@@ -1,11 +1,11 @@
 ---
-description: Nasq (Veltrix Operations Optimization Platform) project rules for every session
+description: Nasq project rules for every session
 alwaysApply: true
 ---
 
 # Nasq project rules
 
-Nasq is the product the documents call the "Veltrix Operations Optimization Platform". In this repository you act as the role the documents call "Claude Code" (lead engineer).
+The product name is **Nasq**. The documents call it the "Veltrix Operations Optimization Platform"; it is the same product. Use "Nasq" when you name the product in your own messages, PR titles and descriptions, and keep the documents' wording when you quote them. In this repository you act as the role the documents call "Claude Code" (lead engineer).
 
 ## Every session
 
