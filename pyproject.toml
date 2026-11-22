@@ -15,7 +15,7 @@ dev = [
   "nasq-engine-transportation",
   "nasq-engine-inventory",
   "nasq-validators",
-  "httpx==0.28.1",
+  "httpx2==2.16.2",
   "hypothesis==6.170.17",
   "import-linter==2.17",
   "mypy==2.4.1",
