@@ -34,7 +34,7 @@ LAYOUT = [
     "infra",
 ]
 
-COMPOSE_SERVICES = ["postgres", "api", "worker", "web", "mailpit", "minio"]
+COMPOSE_SERVICES = ["postgres", "api", "worker", "web", "mailpit", "rustfs"]
 MAKE_TARGETS = ["dev", "test", "lint", "typecheck", "migrate", "bench"]
 EXACT_NPM_VERSION = re.compile(r"^\d+\.\d+\.\d+$")
 

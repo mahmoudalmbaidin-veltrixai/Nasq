@@ -1,6 +1,6 @@
 # Local development stack. Start with `make dev`.
-# Every port binds to 127.0.0.1 only. Passwords default to CHANGE_ME placeholders;
-# override them in a local .env (never committed).
+# Every port binds to 127.0.0.1 only; host ports can be moved with *_HOST_PORT variables.
+# Passwords default to CHANGE_ME placeholders; override them in a local .env (never committed).
 name: nasq
 
 x-app-env: &app-env
@@ -22,7 +22,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U veltrix_owner -d veltrix"]
       interval: 5s
@@ -38,7 +38,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:${API_HOST_PORT:-8000}:8000"
     healthcheck:
       test:
         - CMD
@@ -71,7 +71,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     ports:
-      - "127.0.0.1:5173:5173"
+      - "127.0.0.1:${WEB_HOST_PORT:-5173}:5173"
     healthcheck:
       test:
         - CMD
@@ -85,31 +85,32 @@ services:
   mailpit:
     image: axllent/mailpit:v1.34.0
     ports:
-      - "127.0.0.1:8025:8025"
-      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:${MAILPIT_HOST_PORT:-8025}:8025"
+      - "127.0.0.1:${SMTP_HOST_PORT:-1025}:1025"
     healthcheck:
       test: ["CMD", "/mailpit", "readyz"]
       interval: 5s
       timeout: 3s
       retries: 20
 
-  minio:
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
-    command: ["server", "/data", "--console-address", ":9001"]
+  # S3-compatible object storage (ADR-006). The task named MinIO, but MinIO no longer
+  # publishes community images; RustFS is the agreed local substitute.
+  rustfs:
+    image: rustfs/rustfs:1.0.6
     environment:
-      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-CHANGE_ME}
-      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-CHANGE_ME}
+      RUSTFS_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-CHANGE_ME}
+      RUSTFS_SECRET_KEY: ${STORAGE_SECRET_KEY:-CHANGE_ME}
     volumes:
-      - minio-data:/data
+      - storage-data:/data
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
+      - "127.0.0.1:${STORAGE_HOST_PORT:-9000}:9000"
+      - "127.0.0.1:${STORAGE_CONSOLE_HOST_PORT:-9001}:9001"
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health/ready"]
       interval: 5s
       timeout: 3s
       retries: 20
 
 volumes:
   postgres-data:
-  minio-data:
+  storage-data:

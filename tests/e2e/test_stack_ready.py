@@ -14,7 +14,7 @@ pytestmark = pytest.mark.stack
 API_URL = os.environ.get("NASQ_STACK_API_URL", "http://localhost:8000")
 WEB_URL = os.environ.get("NASQ_STACK_WEB_URL", "http://localhost:5173")
 MAILPIT_URL = os.environ.get("NASQ_STACK_MAILPIT_URL", "http://localhost:8025")
-MINIO_URL = os.environ.get("NASQ_STACK_MINIO_URL", "http://localhost:9000")
+STORAGE_URL = os.environ.get("NASQ_STACK_STORAGE_URL", "http://localhost:9000")
 TIMEOUT = httpx.Timeout(10.0)
 
 
@@ -44,4 +44,4 @@ def test_mailpit_is_ready() -> None:
 
 
 def test_object_storage_is_ready() -> None:
-    assert httpx.get(f"{MINIO_URL}/minio/health/ready", timeout=TIMEOUT).status_code == 200
+    assert httpx.get(f"{STORAGE_URL}/health/ready", timeout=TIMEOUT).status_code == 200

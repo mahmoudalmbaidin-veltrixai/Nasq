@@ -78,5 +78,5 @@ of ADR-005 acceptance.
 | node | 24.22.3-bookworm-slim | MIT (Debian packages: various) | web image | |
 | ghcr.io/astral-sh/uv | 0.11.28 | Apache-2.0 or MIT | api and worker images | |
 | axllent/mailpit | v1.34.0 | MIT | docker-compose | |
-| quay.io/minio/minio | RELEASE.2025-09-07T16-13-09Z | AGPL-3.0 | docker-compose | Local development only, never shipped or offered over a network to customers. MinIO no longer publishes free community images; production storage is chosen with ADR-006/ADR-007. |
+| rustfs/rustfs | 1.0.6 | Apache-2.0 | docker-compose | Local S3-compatible storage. Replaces MinIO named in P0-01: MinIO images can no longer be pulled anonymously from quay.io or Docker Hub. Production storage is chosen with ADR-006/ADR-007. |
 | gitleaks | 8.30.1 (developer machine) | MIT | make secrets | |
