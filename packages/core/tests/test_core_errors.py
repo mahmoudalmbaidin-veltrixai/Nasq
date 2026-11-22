@@ -33,7 +33,9 @@ def test_problem_document_has_rfc7807_members_and_nasq_extensions() -> None:
 
 
 def test_problem_document_is_translated_to_arabic() -> None:
-    doc = problem_document(code="not_found", status=404, locale="ar", instance=None, request_id=None)
+    doc = problem_document(
+        code="not_found", status=404, locale="ar", instance=None, request_id=None
+    )
 
     assert doc["title"] == MESSAGES["not_found"]["ar"].title
 

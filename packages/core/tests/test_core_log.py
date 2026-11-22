@@ -1,6 +1,7 @@
 import json
 import logging
 import sys
+from collections.abc import Iterator
 
 import pytest
 
@@ -69,10 +70,22 @@ def test_log_line_includes_exception_type_and_traceback() -> None:
     assert "Traceback" in payload["exception"]
 
 
+@pytest.fixture
+def _restore_root_logger() -> Iterator[None]:
+    root = logging.getLogger()
+    handlers, level = list(root.handlers), root.level
+    yield
+    root.handlers[:] = handlers
+    root.setLevel(level)
+
+
+@pytest.mark.usefixtures("_restore_root_logger")
 def test_configure_logging_writes_json_to_stdout(capsys: pytest.CaptureFixture[str]) -> None:
+    configure_logging("INFO")
     configure_logging("INFO")
 
     logging.getLogger("nasq.test").info("configured")
 
     out = capsys.readouterr().out.strip().splitlines()
-    assert json.loads(out[-1])["message"] == "configured"
+    assert len(out) == 1, "configuring twice must not duplicate log lines"
+    assert json.loads(out[0])["message"] == "configured"

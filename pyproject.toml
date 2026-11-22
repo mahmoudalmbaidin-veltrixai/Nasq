@@ -72,6 +72,9 @@ ignore = [
 ]
 "apps/api/migrations/**" = ["INP001"]
 
+[tool.ruff.lint.pylint]
+max-args = 6
+
 [tool.ruff.lint.isort]
 known-first-party = [
   "nasq_api", "nasq_worker", "nasq_core", "nasq_contracts", "nasq_engine_production",
@@ -129,7 +132,7 @@ root_packages = [
 ]
 
 [[tool.importlinter.contracts]]
-name = "Validators never import engines (PRD §27, §29)"
+name = "Validators never import engines (PRD sections 27 and 29)"
 type = "forbidden"
 source_modules = ["nasq_validators"]
 forbidden_modules = [
@@ -137,7 +140,7 @@ forbidden_modules = [
 ]
 
 [[tool.importlinter.contracts]]
-name = "Engines never import validators (PRD §27, §29)"
+name = "Engines never import validators (PRD sections 27 and 29)"
 type = "forbidden"
 source_modules = [
   "nasq_engine_production", "nasq_engine_transportation", "nasq_engine_inventory",

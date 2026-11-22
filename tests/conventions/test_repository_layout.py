@@ -51,7 +51,10 @@ def _workspace_members() -> list[Path]:
 
 def _python_requirements() -> list[tuple[Path, str]]:
     found: list[tuple[Path, str]] = []
-    for pyproject in [ROOT / "pyproject.toml", *(m / "pyproject.toml" for m in _workspace_members())]:
+    for pyproject in [
+        ROOT / "pyproject.toml",
+        *(m / "pyproject.toml" for m in _workspace_members()),
+    ]:
         data = _toml(pyproject)
         requirements = list(data["project"].get("dependencies", []))
         for group in data.get("dependency-groups", {}).values():
@@ -86,7 +89,9 @@ def test_web_app_has_at_least_one_unit_test() -> None:
 
 
 def test_python_dependencies_are_pinned_exactly() -> None:
-    loose = [f"{p.relative_to(ROOT)}: {req}" for p, req in _python_requirements() if "==" not in req]
+    loose = [
+        f"{p.relative_to(ROOT)}: {req}" for p, req in _python_requirements() if "==" not in req
+    ]
     assert not loose, f"unpinned Python dependencies: {loose}"
 
 
