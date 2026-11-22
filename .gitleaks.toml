@@ -1,0 +1,17 @@
+title = "Nasq gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Installed dependencies, generated output and CHANGE_ME placeholders"
+paths = [
+  '''(^|[\\/])node_modules[\\/]''',
+  '''(^|[\\/])\.venv[\\/]''',
+  '''(^|[\\/])\.git[\\/]''',
+  '''(^|[\\/])(dist|htmlcov|playwright-report|test-results)[\\/]''',
+  '''(^|[\\/])\.(mypy|ruff|pytest)_cache[\\/]''',
+  '''(^|[\\/])uv\.lock$''',
+  '''(^|[\\/])package-lock\.json$''',
+]
+regexes = ['''CHANGE_ME''']
