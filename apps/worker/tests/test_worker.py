@@ -1,11 +1,13 @@
 import logging
 import threading
+import time
 from pathlib import Path
 
 import pytest
 from pydantic import SecretStr
 
 from nasq_worker.health import heartbeat_is_fresh
+from nasq_worker.health import main as health_main
 from nasq_worker.main import WorkerSettings, run_worker
 
 
@@ -89,6 +91,20 @@ def test_heartbeat_is_fresh_when_recent(tmp_path: Path) -> None:
     path.write_text("1990.0", encoding="utf-8")
 
     assert heartbeat_is_fresh(path, max_age_seconds=60, now=2000.0)
+
+
+def test_healthcheck_command_exit_code_follows_the_heartbeat(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    heartbeat = tmp_path / "heartbeat"
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://nobody:CHANGE_ME@127.0.0.1:1/x")
+    monkeypatch.setenv("WORKER_HEARTBEAT_FILE", str(heartbeat))
+
+    assert health_main() == 1
+
+    heartbeat.write_text(f"{time.time()}", encoding="utf-8")
+
+    assert health_main() == 0
 
 
 def test_heartbeat_is_not_fresh_when_unreadable(tmp_path: Path) -> None:

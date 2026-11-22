@@ -9,8 +9,8 @@ export const DEFAULT_LOCALE: Locale = 'en'
 
 type MessageSchema = typeof en
 
+// Composition API mode comes from __VUE_I18N_LEGACY_API__ = false in vite.config.ts.
 export const i18n = createI18n<[MessageSchema], Locale, false>({
-  legacy: false,
   locale: DEFAULT_LOCALE,
   fallbackLocale: DEFAULT_LOCALE,
   messages: { en, ar },

@@ -1,8 +1,9 @@
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 
 import pytest
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 from fastapi.testclient import TestClient
 
 
@@ -38,3 +39,25 @@ def test_unhandled_exception_is_logged_with_the_request_id(
     errors = [r for r in caplog.records if r.levelno == logging.ERROR]
     assert errors
     assert errors[0].__dict__["request_id"] == response.headers["x-request-id"]
+
+
+def test_error_after_the_response_started_is_logged_and_not_masked(
+    make_app: Callable[..., FastAPI], caplog: pytest.LogCaptureFixture
+) -> None:
+    app = make_app()
+
+    def chunks() -> Iterator[bytes]:
+        yield b"partial"
+        raise RuntimeError("stream broke")
+
+    @app.get("/_test/stream")
+    def stream() -> StreamingResponse:
+        return StreamingResponse(chunks())
+
+    with (
+        caplog.at_level(logging.ERROR, logger="nasq.api"),
+        pytest.raises(RuntimeError, match="stream broke"),
+    ):
+        TestClient(app).get("/_test/stream")
+
+    assert any(r.levelno == logging.ERROR for r in caplog.records)

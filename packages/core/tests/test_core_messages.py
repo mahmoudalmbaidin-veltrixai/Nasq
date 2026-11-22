@@ -40,6 +40,7 @@ def test_unknown_code_raises_instead_of_inventing_text() -> None:
         ("ar;q=0", "en"),
         ("*", "en"),
         ("ar;q=not-a-number, en", "en"),
+        ("ar;level=1", "ar"),
     ],
 )
 def test_negotiate_locale(header: str | None, expected: str) -> None:

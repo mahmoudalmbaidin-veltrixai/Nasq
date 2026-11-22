@@ -85,7 +85,8 @@ def test_readyz_problem_is_in_arabic_when_requested(
 
 
 def test_readyz_uses_real_database_probes_by_default(settings: Settings) -> None:
-    response = TestClient(create_app(settings)).get("/readyz")
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/readyz")
 
     assert response.status_code == 503
     assert response.json()["checks"] == {"database": "unavailable", "queue": "unavailable"}

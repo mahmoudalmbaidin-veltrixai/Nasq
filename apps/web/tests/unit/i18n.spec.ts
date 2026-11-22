@@ -9,7 +9,9 @@ type Tree = { [key: string]: string | Tree }
 function flatten(tree: Tree, prefix = ''): Record<string, string> {
   return Object.entries(tree).reduce<Record<string, string>>((flat, [key, value]) => {
     const path = prefix ? `${prefix}.${key}` : key
-    return typeof value === 'string' ? { ...flat, [path]: value } : { ...flat, ...flatten(value, path) }
+    return typeof value === 'string'
+      ? { ...flat, [path]: value }
+      : { ...flat, ...flatten(value, path) }
   }, {})
 }
 
