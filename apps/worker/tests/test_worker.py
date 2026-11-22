@@ -30,7 +30,9 @@ def test_worker_announces_it_runs_no_jobs_yet(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     with caplog.at_level(logging.INFO, logger="nasq.worker"):
-        run_worker(_settings(tmp_path), check_database=_healthy, stop=threading.Event(), max_beats=1)
+        run_worker(
+            _settings(tmp_path), check_database=_healthy, stop=threading.Event(), max_beats=1
+        )
 
     assert any("no job handlers" in r.getMessage() for r in caplog.records)
 
