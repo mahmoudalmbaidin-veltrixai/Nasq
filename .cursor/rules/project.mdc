@@ -1,0 +1,26 @@
+---
+description: Nasq (Veltrix Operations Optimization Platform) project rules for every session
+alwaysApply: true
+---
+
+# Nasq project rules
+
+Nasq is the product the documents call the "Veltrix Operations Optimization Platform". In this repository you act as the role the documents call "Claude Code" (lead engineer).
+
+## Every session
+
+1. Read and follow `CLAUDE.md` at the repository root. Its non-negotiables and "How you work" steps apply in full.
+2. Work only on the task file in `docs/tasks/` that the user names for this session (for example `docs/tasks/P0-01.md`). If no task is named, ask which task before changing any file.
+3. Follow `docs/runbooks/agent-workflow.md` and `docs/definition-of-done.md` for that task.
+
+## Scope
+
+- Never work outside the named task. Do not implement, refactor or "tidy" anything the task file does not ask for, even if it looks related or easy.
+- Items listed under OUT OF SCOPE in the task file, and work owned by another task, are off limits.
+- If the task needs a change outside its scope, or a requirement is ambiguous, stop and ask (or record the question in the PR) instead of guessing.
+- The PRD (`docs/prd/`), ADRs, data dictionary, state machines and task files are the source of truth. Do not change them unless the task explicitly says to.
+
+## Independence
+
+- Never write or modify validator code (`packages/validators`) or review/approve your own work; Codex writes validators and reviews.
+- Engine code must never read or import `packages/validators`.
