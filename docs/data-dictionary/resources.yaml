@@ -1,0 +1,79 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+operational_resource:
+  description: "Line, machine or vehicle"
+  owner_engines: [production, transportation]
+  fields:
+    code: {type: string, required: true}
+    site_id: {type: ref:site, required: true}
+    kind: {type: enum, values: [line, machine, vehicle]}
+    calendar_id: {type: ref:calendar, required: true}
+    weight_capacity: {type: quantity, when: vehicle}
+    volume_capacity: {type: quantity, when: vehicle}
+    compatible_load_types: {type: "list[string]", when: vehicle}
+  controls: [documented units, capability and availability]
+
+calendar:
+  fields:
+    name: {type: string, required: true}
+    time_zone: {type: string, required: true, rule: "IANA"}
+
+shift:
+  fields:
+    calendar_id: {type: ref:calendar, required: true}
+    weekday: {type: int, rule: "1=Monday ... 7=Sunday"}
+    start_local: {type: string, rule: "HH:MM local time"}
+    end_local: {type: string, rule: "May cross midnight"}
+    is_overtime: {type: bool, default: false, rule: "Usable only when authorized in configuration"}
+
+downtime:
+  fields:
+    resource_id: {type: ref:operational_resource, required: true}
+    start_at: {type: datetime_utc, required: true}
+    end_at: {type: datetime_utc, required: true}
+    reason: {type: enum, values: [maintenance, breakdown, holiday, other]}
+
+product_routing:
+  when: production
+  fields:
+    product_id: {type: ref:product, required: true}
+    version: {type: int, required: true}
+
+routing_operation:
+  when: production
+  fields:
+    routing_id: {type: ref:product_routing, required: true}
+    sequence: {type: int, required: true}
+    name: {type: string}
+    transfer_minutes_to_next: {type: duration_minutes, default: 0}
+    interruptible: {type: bool, default: false}
+    release_required: {type: bool, default: false}
+
+operation_eligibility:
+  when: production
+  fields:
+    routing_operation_id: {type: ref:routing_operation, required: true}
+    resource_id: {type: ref:operational_resource, required: true}
+    rate_per_hour: {type: quantity, required: true}
+    setup_minutes: {type: duration_minutes, default: 0}
+    min_batch: {type: quantity}
+    max_batch: {type: quantity}
+  controls: ["No eligibility row = the product may never run there (PRD01)"]
+
+changeover:
+  when: production
+  fields:
+    resource_id: {type: ref:operational_resource, required: true}
+    from_product_id: {type: ref:product, required: true}
+    to_product_id: {type: ref:product, required: true}
+    minutes: {type: duration_minutes, required: true}
+    cost: {type: money}
+  controls: ["Sequence-dependent; applied for the actual order of operations (PRD02)"]
+
+material_requirement:
+  when: production
+  fields:
+    routing_operation_id: {type: ref:routing_operation, required: true}
+    material_product_id: {type: ref:product, required: true}
+    quantity_per_unit: {type: quantity, required: true}

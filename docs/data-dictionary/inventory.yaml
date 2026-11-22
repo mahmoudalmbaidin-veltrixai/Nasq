@@ -1,0 +1,45 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+inventory_balance:
+  owner_engines: [production, inventory]
+  source_of_truth: erp_or_wms
+  fields:
+    product_id: {type: ref:product, required: true}
+    site_id: {type: ref:site, required: true}
+    available: {type: quantity, required: true}
+    reserved: {type: quantity, default: 0}
+    unreleased: {type: quantity, default: 0, rule: "Quality hold; cannot be consumed"}
+    as_of: {type: datetime_utc, required: true}
+  controls: ["Keep available, reserved and unreleased separate (§9)"]
+
+batch:
+  fields:
+    product_id: {type: ref:product, required: true}
+    site_id: {type: ref:site, required: true}
+    lot_code: {type: string}
+    quantity: {type: quantity, required: true}
+    quality_status: {type: enum, values: [released, quarantine, rejected]}
+    expires_at: {type: datetime_utc, when: "shelf life tracked"}
+  controls: ["Expired batches never serve demand (INV03)"]
+
+material_receipt:
+  description: "Confirmed or expected incoming material or purchase"
+  fields:
+    product_id: {type: ref:product, required: true}
+    site_id: {type: ref:site, required: true}
+    quantity: {type: quantity, required: true}
+    expected_at: {type: datetime_utc, required: true}
+    status: {type: enum, values: [expected, confirmed, received, released]}
+  controls: ["No consumption before confirmed arrival and release (§12, INV01)"]
+
+open_order:
+  description: "Open purchase or transfer order"
+  when: inventory
+  fields:
+    kind: {type: enum, values: [purchase, transfer]}
+    product_id: {type: ref:product, required: true}
+    from_site_id: {type: ref:site}
+    to_site_id: {type: ref:site, required: true}
+    quantity: {type: quantity, required: true}
+    expected_at: {type: datetime_utc, required: true}

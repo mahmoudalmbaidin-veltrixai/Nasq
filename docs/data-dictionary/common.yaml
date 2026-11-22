@@ -1,0 +1,18 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+common_fields:
+  id: {type: uuid, rule: "UUIDv7, stable internal identifier"}
+  org_id: {type: ref:organization, required: true, rule: "Set from the session only, never from the client (TEN01)"}
+  external_id: {type: string, rule: "Unique per org_id + source when integrated (DAT02)"}
+  source: {type: enum, values: [manual, file_import, erp, execution_system, api, system]}
+  created_at: {type: datetime_utc}
+  modified_at: {type: datetime_utc}
+  active: {type: bool, default: true, rule: "Deactivate instead of delete when referenced by any plan (§9)"}
+  effective_from: {type: datetime_utc, when: "planning-relevant entities"}
+  effective_to: {type: datetime_utc, when: "planning-relevant entities"}
+
+rules:
+  - Reference data used in a historical plan is never deleted.
+  - Times are stored in UTC and shown in the site's IANA time zone.
+  - Quantities always carry a unit; money always carries a currency.

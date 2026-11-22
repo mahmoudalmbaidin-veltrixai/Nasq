@@ -1,0 +1,8 @@
+# Regression thresholds for the production engine. Set by the OR specialist in P5-04.
+# Agents may propose changes in a PR but never change these values on their own.
+status: awaiting_or_specialist
+objective_regression_max_percent: null   # e.g. 2.0
+p95_solve_time_regression_max_percent: 20
+memory_regression_max_percent: 25
+fail_on_new_validator_violation: true
+fail_on_status_downgrade: true          # e.g. proven_optimal -> feasible on a tiny case

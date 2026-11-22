@@ -1,0 +1,40 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+execution_event:
+  source_of_truth: execution_system
+  fields:
+    event_id: {type: string, required: true, rule: "Unique per source"}
+    source: {type: string, required: true}
+    occurred_at: {type: datetime_utc, required: true}
+    received_at: {type: datetime_utc, required: true}
+    kind: {type: enum, values: [operation_started, operation_completed, quantity_reported, breakdown, repaired, stop_arrived, stop_completed, delivery_failed, correction]}
+    plan_version_id: {type: ref:plan_version}
+    reference: {type: string, rule: "Operation, stop or order external id"}
+    quantity: {type: quantity}
+    corrects_event_id: {type: string, when: "kind = correction"}
+  controls: ["Deduplicate by (source, event_id); corrections never erase originals; out-of-order arrivals applied by occurred_at (§18)"]
+
+outbox_message:
+  fields:
+    destination: {type: string, required: true}
+    idempotency_key: {type: string, required: true}
+    payload: {type: json, required: true}
+    status: {type: enum, values: [pending, sent, accepted, failed, executed, dead_letter]}
+    attempts: {type: int, default: 0}
+    last_attempt_at: {type: datetime_utc}
+    external_reference: {type: string}
+  controls: ["Written in the approval transaction (INT01)"]
+
+audit_event:
+  fields:
+    actor_id: {type: string}
+    actor_type: {type: enum, values: [user, api_key, system, support]}
+    action: {type: string, required: true}
+    resource_type: {type: string, required: true}
+    resource_id: {type: string, required: true}
+    version: {type: int}
+    change_summary: {type: json, rule: "No secrets or full personal data"}
+    request_id: {type: string}
+    occurred_at: {type: datetime_utc, required: true}
+  controls: ["Append-only (AUD01)"]

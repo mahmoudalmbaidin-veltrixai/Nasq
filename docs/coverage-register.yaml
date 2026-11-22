@@ -1,0 +1,24 @@
+# Coverage register (PRD §4, §30). Maintained by the product owner.
+# An industry name is never a claim of full support. Only validated entries may be sold.
+templates:
+  - id: batch-manufacturing-v1
+    engine: production
+    status: planned            # planned | in_validation | validated | retired
+    supported_constraints:
+      - line compatibility
+      - no overlap including setup
+      - operation precedence with transfer time
+      - sequence-dependent changeovers
+      - working calendars and downtime
+      - time-phased material availability
+      - due dates (soft with penalty, or hard)
+      - frozen window and locks
+      - authorized overtime
+    exclusions:
+      - continuous manufacturing
+      - furnace or process physics
+      - joint products and co-products
+      - long-range aggregate planning
+    tested_size_range: "to be measured in P5-04"
+    last_validation_date: null
+    validated_with_customer: null

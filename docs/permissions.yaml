@@ -1,0 +1,30 @@
+# Permission catalog. DRAFT from PRD §6, implemented in task P1-03 (IAM01).
+# Access = role + authorized sites + engine entitlement. Deny by default.
+roles:
+  platform_admin:
+    allow: [org.create, org.suspend, entitlement.manage, service.monitor]
+    deny_default: [customer operational data]
+  org_admin:
+    allow: [user.invite, user.manage, role.assign, site.manage, settings.manage, support_access.approve, audit.read, api_key.manage]
+    scope: own organization
+  data_steward:
+    allow: [import.run, import.publish, mapping.manage, master_data.edit, warning.accept, sync.run]
+    deny: [plan.approve]
+  planner:
+    allow: [scenario.create, solve.run, solve.cancel, plan.edit, plan.lock, plan.submit, config.edit_draft, report.read]
+    scope: authorized engines and sites
+  approver:
+    allow: [plan.approve, plan.reject, plan.request_changes, plan.revoke_release, plan.export, staleness.acknowledge]
+    rule: "Document reasons for permitted overrides"
+  execution_supervisor:
+    allow: [event.record, event.correct, replan.request, monitor.read]
+    deny: [config.edit, cost.edit_baseline]
+  finance:
+    allow: [kpi.read, baseline.edit, financial_assumption.edit, financial_impact.approve, report.read, report.export]
+    scope: "Operational read access plus authorized financial assumptions"
+  support:
+    allow: [diagnostics.read]
+    rule: "Only through a time-limited, scope-limited grant approved by org_admin; logged and revocable"
+settings:
+  separation_of_duties: {default: false, rule: "When true, the plan author cannot approve it"}
+  mfa_required_roles: [platform_admin, org_admin, approver, finance]

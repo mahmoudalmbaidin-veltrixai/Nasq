@@ -1,0 +1,23 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+product:
+  owner_engines: [production, transportation, inventory]
+  fields:
+    code: {type: string, required: true}
+    name: {type: string, required: true}
+    base_unit: {type: string, required: true, example: piece}
+    weight_per_base_unit: {type: quantity, unit_family: mass}
+    volume_per_base_unit: {type: quantity, unit_family: volume}
+    shelf_life_days: {type: int, when: "shelf life tracked"}
+    load_type: {type: string, when: transportation}
+  controls: ["Explicit unit conversions; never mix items and cases (DAT03)"]
+
+unit_conversion:
+  fields:
+    product_id: {type: ref:product, required: true}
+    from_unit: {type: string, required: true, example: case}
+    to_unit: {type: string, required: true, example: piece}
+    factor: {type: decimal, required: true, example: 24}
+    rounding: {type: enum, values: [none, up, down, nearest]}
+  controls: ["A missing conversion path raises an error; no guessing"]

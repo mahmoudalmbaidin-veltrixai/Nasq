@@ -1,0 +1,16 @@
+# Solve run states. DRAFT, approved in P0-04. PRD §17, RUN01.
+# Separate from plan states.
+states: [queued, running, succeeded, time_limit, failed, canceled]
+initial: queued
+terminal: [succeeded, time_limit, failed, canceled]
+transitions:
+  - {from: queued,  to: running,    by: worker}
+  - {from: queued,  to: canceled,   by: [planner, system]}
+  - {from: running, to: succeeded,  by: worker, note: "Solver finished; result_status says how good"}
+  - {from: running, to: time_limit, by: worker, note: "Time budget reached; may still hold a feasible incumbent"}
+  - {from: running, to: failed,     by: [worker, system], note: "Crash, memory limit or error; reason stored"}
+  - {from: running, to: canceled,   by: [planner, system]}
+  - {from: running, to: queued,     by: system, note: "One automatic retry after worker crash, then failed"}
+rules:
+  - Closing the browser never changes the state.
+  - failed and canceled runs never create a releasable plan.

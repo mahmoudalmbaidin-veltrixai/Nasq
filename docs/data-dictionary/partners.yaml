@@ -1,0 +1,30 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+customer:
+  fields:
+    code: {type: string, required: true}
+    name: {type: string, required: true}
+    site_id: {type: ref:site, when: "delivery address managed as a site"}
+    address_text: {type: text, when: transportation}
+    latitude: {type: decimal, when: transportation}
+    longitude: {type: decimal, when: transportation}
+  controls: ["Minimize personal data (§24); no individual contact details unless required"]
+
+supplier:
+  fields:
+    code: {type: string, required: true}
+    name: {type: string, required: true}
+    default_lead_time_days: {type: int, when: inventory}
+    calendar_id: {type: ref:calendar, when: inventory}
+  controls: ["Minimize personal data (§24)"]
+
+supplier_product:
+  when: inventory
+  fields:
+    supplier_id: {type: ref:supplier, required: true}
+    product_id: {type: ref:product, required: true}
+    lead_time_days: {type: int, required: true}
+    minimum_order_quantity: {type: quantity}
+    pack_multiple: {type: quantity}
+    unit_price: {type: money}

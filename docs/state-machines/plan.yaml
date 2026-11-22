@@ -1,0 +1,21 @@
+# Plan version states. DRAFT, approved in P0-04. PRD §17, PLN01, APR01.
+states: [draft, calculated, in_review, submitted, approved, rejected, exported, released, in_progress, completed, superseded]
+initial: draft
+transitions:
+  - {from: draft,       to: calculated,  by: system,   guard: "Solve run succeeded or time_limit with a feasible incumbent"}
+  - {from: calculated,  to: in_review,   by: planner}
+  - {from: in_review,   to: submitted,   by: planner,  guard: "No hard validator violations"}
+  - {from: submitted,   to: approved,    by: approver, guard: "Feasible, data fresh or acknowledged, approver authorized, separation of duties if enabled, no conflicting newer version"}
+  - {from: submitted,   to: rejected,    by: approver, guard: "Comment required"}
+  - {from: rejected,    to: draft,       by: planner,  note: "Creates a new version; the rejected one is kept"}
+  - {from: approved,    to: exported,    by: [approver, planner], note: "File export"}
+  - {from: approved,    to: released,    by: [approver, system],  note: "Integration submission through the outbox"}
+  - {from: approved,    to: draft,       by: approver, note: "Revoke before execution; creates a new draft version"}
+  - {from: exported,    to: in_progress, by: [execution_supervisor, system]}
+  - {from: released,    to: in_progress, by: [execution_supervisor, system]}
+  - {from: in_progress, to: completed,   by: [execution_supervisor, system]}
+  - {from: [approved, exported, released, in_progress], to: superseded, by: system, guard: "A newer version for the same scope is approved"}
+rules:
+  - Approved, exported, released, in_progress, completed and superseded versions are immutable.
+  - Only one active approved version per organization, engine and scope.
+  - Every transition is audited with actor and reason.

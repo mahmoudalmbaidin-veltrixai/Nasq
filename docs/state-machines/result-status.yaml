@@ -1,0 +1,26 @@
+# Honest result statuses. DRAFT, approved in P0-04. PRD §16, RUN02.
+statuses:
+  proven_optimal:
+    meaning: "Optimality established for the specified model under the solver's result status"
+    ui: "Show status and relevant numerical bounds"
+  feasible:
+    meaning: "A constraint-compliant solution exists without proof of optimality"
+    ui: "Show quality, bound and gap where available"
+  proven_infeasible:
+    meaning: "The solver proved the model has no solution"
+    ui: "Show diagnosis and its limits; request changes"
+  inconclusive:
+    meaning: "Search or time ended without a solution or a proof"
+    ui: "Never call it impossible; allow adjustment or retry"
+  failed_or_canceled:
+    meaning: "Execution issue or user cancellation"
+    ui: "Preserve the reason; do not release an execution plan"
+mapping_examples_cp_sat:
+  OPTIMAL: proven_optimal
+  FEASIBLE: feasible
+  INFEASIBLE: proven_infeasible
+  UNKNOWN: inconclusive
+  MODEL_INVALID: failed_or_canceled
+rules:
+  - Never label a timeout without a solution as infeasible.
+  - Never claim a best solution without proof.

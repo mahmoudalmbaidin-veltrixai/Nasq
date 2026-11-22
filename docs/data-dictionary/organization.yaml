@@ -1,0 +1,26 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+organization:
+  owner_engines: [all]
+  fields:
+    code: {type: string, required: true}
+    name: {type: string, required: true}
+    default_currency: {type: string, rule: "ISO 4217, e.g. JOD"}
+    default_locale: {type: enum, values: [ar, en]}
+    status: {type: enum, values: [active, suspended]}
+  controls: [organization isolation]
+
+site:
+  description: "Factory, warehouse, depot or other location owned by the organization"
+  owner_engines: [production, transportation, inventory]
+  fields:
+    code: {type: string, required: true}
+    name: {type: string, required: true}
+    type: {type: enum, values: [factory, warehouse, depot, store, other]}
+    currency: {type: string, rule: "ISO 4217"}
+    time_zone: {type: string, required: true, rule: "IANA name such as Asia/Amman; never a fixed offset"}
+    latitude: {type: decimal, when: transportation}
+    longitude: {type: decimal, when: transportation}
+    coordinates_verified: {type: bool, default: false}
+  controls: [location calendar]

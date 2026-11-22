@@ -1,0 +1,27 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+order:
+  owner_engines: [production, transportation, inventory]
+  source_of_truth: erp
+  fields:
+    number: {type: string, required: true}
+    customer_id: {type: ref:customer}
+    site_id: {type: ref:site, required: true}
+    priority: {type: int, default: 0}
+    status: {type: enum, values: [open, in_progress, completed, cancelled]}
+  controls: [deduplication by external_id]
+
+order_line:
+  fields:
+    order_id: {type: ref:order, required: true}
+    product_id: {type: ref:product, required: true}
+    quantity: {type: quantity, required: true, rule: "Positive"}
+    due_at: {type: datetime_utc, required: true}
+    due_date_type: {type: enum, values: [soft, hard], default: soft, rule: "Hard = mandatory deadline (§12)"}
+    delivery_window_start: {type: datetime_utc, when: transportation}
+    delivery_window_end: {type: datetime_utc, when: transportation}
+    window_meaning: {type: enum, values: [arrival, completion], when: transportation}
+    service_minutes: {type: duration_minutes, when: transportation}
+    split_allowed: {type: bool, default: false, rule: "Explicit policy, never a hidden default (§12, §13)"}
+  controls: [positive quantities, valid references]

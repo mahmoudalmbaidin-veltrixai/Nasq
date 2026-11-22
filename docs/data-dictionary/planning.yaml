@@ -1,0 +1,65 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+data_snapshot:
+  fields:
+    content_hash: {type: string, required: true, rule: "Hash of canonical JSON of all inputs"}
+    created_at: {type: datetime_utc}
+    data_versions: {type: json, rule: "Published data version per source"}
+  controls: ["Immutable after creation (§10, §17)"]
+
+configuration_version:
+  fields:
+    engine: {type: enum, values: [production, transportation, inventory]}
+    template_id: {type: string}
+    version: {type: int, required: true}
+    body: {type: json, required: true, rule: "Validated against the engine JSON Schema"}
+    active: {type: bool}
+  controls: ["Results store the configuration version they used (CFG01)"]
+
+scenario:
+  fields:
+    name: {type: string, required: true}
+    engine: {type: enum, values: [production, transportation, inventory]}
+    scope: {type: json, rule: "Sites, resources, horizon start and end"}
+    assumptions: {type: json, rule: "Recorded changes such as extra shift or changed due date"}
+    base_plan_version_id: {type: ref:plan_version}
+
+solve_run:
+  fields:
+    scenario_id: {type: ref:scenario, required: true}
+    snapshot_id: {type: ref:data_snapshot, required: true}
+    configuration_version_id: {type: ref:configuration_version, required: true}
+    state: {type: enum, source: docs/state-machines/solve.yaml}
+    result_status: {type: enum, source: docs/state-machines/result-status.yaml}
+    engine_version: {type: string}
+    solver_name: {type: string}
+    solver_version: {type: string}
+    seed: {type: int}
+    time_limit_seconds: {type: int}
+    objective_values: {type: json}
+    bound: {type: json, rule: "Only when the solver provides it"}
+    gap: {type: decimal, rule: "Only when available"}
+    started_at: {type: datetime_utc}
+    finished_at: {type: datetime_utc}
+    actor_id: {type: ref:user}
+
+plan_version:
+  fields:
+    scenario_id: {type: ref:scenario, required: true}
+    solve_run_id: {type: ref:solve_run}
+    predecessor_id: {type: ref:plan_version}
+    version_number: {type: int, required: true}
+    state: {type: enum, source: docs/state-machines/plan.yaml}
+    change_reason: {type: text}
+    created_by: {type: ref:user}
+    stale: {type: bool, default: false}
+  controls: ["Approved versions are immutable (PLN01)"]
+
+plan_assignment:
+  description: "One scheduled operation, route stop or proposal line in a plan version"
+  fields:
+    plan_version_id: {type: ref:plan_version, required: true}
+    kind: {type: enum, values: [operation, route_stop, purchase, transfer]}
+    payload: {type: json, rule: "Engine-specific shape defined in packages/contracts"}
+    locked: {type: bool, default: false}

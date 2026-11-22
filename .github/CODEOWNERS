@@ -1,0 +1,13 @@
+# Replace the @handles with your real GitHub users or teams.
+*                              @veltrix/tech-lead
+/packages/engines/             @veltrix/or-specialist @veltrix/tech-lead
+/packages/validators/          @veltrix/or-specialist @veltrix/tech-lead
+/docs/engines/                 @veltrix/or-specialist
+/docs/prd/                     @veltrix/product-owner
+/docs/data-dictionary/         @veltrix/product-owner @veltrix/tech-lead
+/docs/sot-matrix.yaml          @veltrix/product-owner
+/docs/coverage-register.yaml   @veltrix/product-owner
+/docs/adr/                     @veltrix/tech-lead @veltrix/product-owner
+/docs/security/                @veltrix/tech-lead
+/CLAUDE.md                     @veltrix/tech-lead
+/AGENTS.md                     @veltrix/tech-lead

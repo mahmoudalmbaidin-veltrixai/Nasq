@@ -1,0 +1,20 @@
+# DRAFT for product owner approval in task P0-04. Source: PRD v1.0 §9.
+# Claude Code completes and validates this file in P0-04; do not invent fields outside the PRD without a change request.
+
+cost:
+  fields:
+    type: {type: enum, values: [overtime_hour, changeover, lateness_per_day, holding_per_unit_day, shortage_per_unit, spoilage_per_unit, vehicle_fixed, vehicle_per_km, vehicle_per_hour, other]}
+    value: {type: money, required: true}
+    applies_to: {type: string, rule: "Resource, product, site or organization reference"}
+    unit: {type: string, required: true}
+    effective_from: {type: datetime_utc, required: true}
+    effective_to: {type: datetime_utc}
+  controls: ["No aggregation across currencies without a documented rate (§9)"]
+
+fx_rate:
+  fields:
+    from_currency: {type: string, required: true}
+    to_currency: {type: string, required: true}
+    rate: {type: decimal, required: true}
+    source: {type: string, required: true}
+    effective_at: {type: datetime_utc, required: true}

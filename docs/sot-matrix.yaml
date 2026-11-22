@@ -1,0 +1,31 @@
+# Source-of-truth matrix. DRAFT for product owner approval (task P0-04). PRD §10.
+# owner: which system holds the authoritative value. editor: who may change it. sync: direction. freshness: default maximum age before plans are marked stale.
+
+entities:
+  organization:          {owner: platform,          editor: platform_admin / org_admin, sync: none,             freshness: n/a}
+  site:                  {owner: platform,          editor: org_admin,                  sync: none,             freshness: n/a}
+  product:               {owner: erp,               editor: data_steward via import,    sync: erp_to_platform,  freshness: 7d}
+  unit_conversion:       {owner: erp,               editor: data_steward,               sync: erp_to_platform,  freshness: 30d}
+  customer:              {owner: erp,               editor: data_steward via import,    sync: erp_to_platform,  freshness: 7d}
+  supplier:              {owner: erp,               editor: data_steward via import,    sync: erp_to_platform,  freshness: 7d}
+  order:                 {owner: erp,               editor: data_steward via import,    sync: erp_to_platform,  freshness: 4h}
+  order_line:            {owner: erp,               editor: data_steward via import,    sync: erp_to_platform,  freshness: 4h}
+  operational_resource:  {owner: platform,          editor: data_steward,               sync: none,             freshness: n/a}
+  calendar_shift:        {owner: platform,          editor: data_steward / planner,     sync: none,             freshness: n/a}
+  downtime:              {owner: execution_system,  editor: execution_supervisor,       sync: mes_to_platform,  freshness: 1h}
+  product_routing:       {owner: erp,               editor: data_steward,               sync: erp_to_platform,  freshness: 30d}
+  changeover:            {owner: platform,          editor: data_steward,               sync: none,             freshness: n/a}
+  inventory_balance:     {owner: erp_or_wms,        editor: none (read only),           sync: wms_to_platform,  freshness: 4h}
+  batch:                 {owner: erp_or_wms,        editor: none (read only),           sync: wms_to_platform,  freshness: 4h}
+  material_receipt:      {owner: erp,               editor: data_steward via import,    sync: erp_to_platform,  freshness: 24h}
+  cost:                  {owner: platform,          editor: finance / data_steward,     sync: none,             freshness: n/a}
+  configuration_version: {owner: platform,          editor: planner (authorized),       sync: none,             freshness: n/a}
+  plan_version:          {owner: platform,          editor: planner / approver,         sync: platform_to_erp_mes, freshness: n/a}
+  execution_event:       {owner: execution_system,  editor: execution_supervisor (manual entry), sync: mes_to_platform, freshness: 15m}
+  purchase_proposal:     {owner: platform,          editor: planner / approver,         sync: platform_to_erp,  freshness: n/a}
+
+open_questions_for_pilot:
+  - Which system holds routings and machine rates at the pilot customer?
+  - Is stock read from ERP or from a separate warehouse system?
+  - Can the execution system send events, or will supervisors enter them manually in Release 1?
+  - Are freshness thresholds above acceptable for the customer's planning rhythm?
