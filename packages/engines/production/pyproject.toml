@@ -1,0 +1,13 @@
+[project]
+name = "nasq-engine-production"
+version = "0.1.0"
+description = "Production scheduling engine (empty until P5-02)."
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[build-system]
+requires = ["hatchling==1.33.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nasq_engine_production"]

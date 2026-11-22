@@ -1,0 +1,1 @@
+"""Nasq background worker."""

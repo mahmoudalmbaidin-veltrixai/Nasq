@@ -1,0 +1,1 @@
+"""Nasq application service."""

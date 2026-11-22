@@ -1,0 +1,18 @@
+[project]
+name = "nasq-worker"
+version = "0.1.0"
+description = "Nasq background worker. Runs no jobs until the queue is decided (ADR-002) and built (P4-01)."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "nasq-core",
+]
+
+[tool.uv.sources]
+nasq-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling==1.33.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nasq_worker"]

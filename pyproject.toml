@@ -1,0 +1,163 @@
+[project]
+name = "nasq"
+version = "0.1.0"
+description = "Nasq monorepo workspace root. Holds shared development tooling only."
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "nasq-api",
+  "nasq-worker",
+  "nasq-core",
+  "nasq-contracts",
+  "nasq-engine-production",
+  "nasq-engine-transportation",
+  "nasq-engine-inventory",
+  "nasq-validators",
+  "httpx==0.28.1",
+  "hypothesis==6.170.17",
+  "import-linter==2.17",
+  "mypy==2.4.1",
+  "pytest==9.2.0",
+  "pytest-cov==7.1.0",
+  "ruff==0.17.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = [
+  "apps/api",
+  "apps/worker",
+  "packages/core",
+  "packages/contracts",
+  "packages/engines/production",
+  "packages/engines/transportation",
+  "packages/engines/inventory",
+  "packages/validators",
+]
+
+[tool.uv.sources]
+nasq-api = { workspace = true }
+nasq-worker = { workspace = true }
+nasq-core = { workspace = true }
+nasq-contracts = { workspace = true }
+nasq-engine-production = { workspace = true }
+nasq-engine-transportation = { workspace = true }
+nasq-engine-inventory = { workspace = true }
+nasq-validators = { workspace = true }
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["apps/web", "node_modules"]
+
+[tool.ruff.lint]
+select = [
+  "E", "W", "F", "I", "N", "UP", "B", "S", "A", "C4", "DTZ", "T20", "PT", "SIM",
+  "RET", "PL", "PERF", "RUF", "BLE", "TRY", "LOG", "G",
+]
+ignore = [
+  "TRY003", # long messages in exceptions are fine; they are not user-facing
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = [
+  "S101",    # assert is how pytest works
+  "PLR2004", # literal status codes read better in tests
+  "N802",    # requirement tests are named test_<REQ-ID>_<behaviour>
+]
+"apps/api/migrations/**" = ["INP001"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+  "nasq_api", "nasq_worker", "nasq_core", "nasq_contracts", "nasq_engine_production",
+  "nasq_engine_transportation", "nasq_engine_inventory", "nasq_validators",
+]
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+files = [
+  "apps/api/src", "apps/api/tests", "apps/api/migrations",
+  "apps/worker/src", "apps/worker/tests",
+  "packages",
+  "tests",
+]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["packages", "apps/api/tests", "apps/worker/tests", "tests"]
+addopts = [
+  "--import-mode=importlib",
+  "--strict-markers",
+  "--strict-config",
+  "-m", "not stack",
+  "--cov",
+  "--cov-report=term-missing:skip-covered",
+]
+markers = [
+  "stack: needs the local Docker Compose stack started with `make dev` (run with `make test-stack`)",
+]
+filterwarnings = ["error"]
+xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+source = [
+  "nasq_api", "nasq_worker", "nasq_core", "nasq_contracts", "nasq_engine_production",
+  "nasq_engine_transportation", "nasq_engine_inventory", "nasq_validators",
+]
+
+# ---------------------------------------------------------------- import-linter
+[tool.importlinter]
+root_packages = [
+  "nasq_api", "nasq_worker", "nasq_core", "nasq_contracts", "nasq_engine_production",
+  "nasq_engine_transportation", "nasq_engine_inventory", "nasq_validators",
+]
+
+[[tool.importlinter.contracts]]
+name = "Validators never import engines (PRD §27, §29)"
+type = "forbidden"
+source_modules = ["nasq_validators"]
+forbidden_modules = [
+  "nasq_engine_production", "nasq_engine_transportation", "nasq_engine_inventory",
+]
+
+[[tool.importlinter.contracts]]
+name = "Engines never import validators (PRD §27, §29)"
+type = "forbidden"
+source_modules = [
+  "nasq_engine_production", "nasq_engine_transportation", "nasq_engine_inventory",
+]
+forbidden_modules = ["nasq_validators"]
+
+[[tool.importlinter.contracts]]
+name = "Core imports no app, engine or validator"
+type = "forbidden"
+source_modules = ["nasq_core"]
+forbidden_modules = [
+  "nasq_api", "nasq_worker", "nasq_engine_production", "nasq_engine_transportation",
+  "nasq_engine_inventory", "nasq_validators",
+]
+
+[[tool.importlinter.contracts]]
+name = "Shared packages never import apps"
+type = "forbidden"
+source_modules = [
+  "nasq_contracts", "nasq_engine_production", "nasq_engine_transportation",
+  "nasq_engine_inventory", "nasq_validators",
+]
+forbidden_modules = ["nasq_api", "nasq_worker"]
