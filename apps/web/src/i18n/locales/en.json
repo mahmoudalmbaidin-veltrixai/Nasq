@@ -1,0 +1,13 @@
+{
+  "app": {
+    "name": "Nasq",
+    "tagline": "Operations plans you can review, approve and execute."
+  },
+  "home": {
+    "scaffoldNotice": "This is the application scaffold. No planning features are enabled yet."
+  },
+  "language": {
+    "switchTo": "العربية",
+    "switchToCode": "ar"
+  }
+}

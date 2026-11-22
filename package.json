@@ -1,0 +1,11 @@
+{
+  "name": "nasq",
+  "private": true,
+  "description": "Nasq monorepo: npm workspace for the web application.",
+  "workspaces": [
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=24.21.0 <25"
+  }
+}
